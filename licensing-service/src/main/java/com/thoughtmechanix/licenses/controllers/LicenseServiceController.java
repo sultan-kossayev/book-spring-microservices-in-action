@@ -1,20 +1,34 @@
 package com.thoughtmechanix.licenses.controllers;
 
 import com.thoughtmechanix.licenses.models.License;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import com.thoughtmechanix.licenses.services.LicenseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/v1/organizations/{organizationId}/licenses")
 public class LicenseServiceController {
 
+    @Autowired
+    private LicenseService licenseService;
+
+    @RequestMapping(method = RequestMethod.POST)
+    public void createLicense(@RequestBody License license) {
+        licenseService.saveLicense(license);
+    }
+
     @RequestMapping(value = "/{licenseId}", method = RequestMethod.GET)
-    public License getLicenses(@PathVariable("organizationId") String organizationId, @PathVariable("licenseId") String licenseId) {
-        return new License(licenseId)
-                .withOrganizationId(organizationId)
-                .withProductName("Teleco")
-                .withLicenseType("Seat");
+    public License getLicense(@PathVariable("organizationId") String organizationId, @PathVariable("licenseId") String licenseId) {
+        License found = licenseService.getLicense(organizationId, licenseId);
+
+        if (Objects.isNull(found)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "license not found");
+        }
+
+        return found;
     }
 }

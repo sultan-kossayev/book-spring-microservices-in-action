@@ -1,15 +1,17 @@
 package com.thoughtmechanix.licenses.models;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "licenses")
 public class License {
 
-    private String id;
+    @Id
+    private String licenseId;
     private String organizationId;
     private String productName;
     private String licenseType;
-
-    public License(String id) {
-        this.id = id;
-    }
+    private String comment;
 
     public License withOrganizationId(String id) {
         setOrganizationId(id);
@@ -29,12 +31,18 @@ public class License {
         return this;
     }
 
-    public String getId() {
-        return id;
+    public License withComment(String comment) {
+        setComment(comment);
+
+        return this;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String getLicenseId() {
+        return licenseId;
+    }
+
+    public void setLicenseId(String licenseId) {
+        this.licenseId = licenseId;
     }
 
     public String getOrganizationId() {
@@ -59,5 +67,24 @@ public class License {
 
     public void setLicenseType(String licenseType) {
         this.licenseType = licenseType;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    @Override
+    public String toString() {
+        return "License{" +
+                "licenseId='" + licenseId + '\'' +
+                ", organizationId='" + organizationId + '\'' +
+                ", productName='" + productName + '\'' +
+                ", licenseType='" + licenseType + '\'' +
+                ", comment='" + comment + '\'' +
+                '}';
     }
 }
