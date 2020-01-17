@@ -4,3 +4,4 @@ spring.data.mongodb.port: 27017
 spring.data.mongodb.database: licenses
 
 example.property: "This is an example property"
+example.property2: "This is an example property2"
