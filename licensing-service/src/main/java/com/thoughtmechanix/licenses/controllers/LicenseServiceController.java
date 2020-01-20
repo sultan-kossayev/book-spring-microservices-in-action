@@ -31,4 +31,17 @@ public class LicenseServiceController {
 
         return found;
     }
+
+    @RequestMapping(value = "/{licenseId}/{clientType}", method = RequestMethod.GET)
+    public License getLicenseByClient(@PathVariable("organizationId") String organizationId,
+                                      @PathVariable("licenseId") String licenseId,
+                                      @PathVariable("clientType") String clientType) {
+        License license = licenseService.getLicense(organizationId, licenseId, clientType);
+
+        if (Objects.isNull(license)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "license not found");
+        }
+
+        return license;
+    }
 }

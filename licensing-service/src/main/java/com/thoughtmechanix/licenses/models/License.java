@@ -1,6 +1,7 @@
 package com.thoughtmechanix.licenses.models;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "licenses")
@@ -13,8 +14,41 @@ public class License {
     private String licenseType;
     private String comment;
 
+    @Transient
+    private String organizationName;
+    @Transient
+    private String contactName;
+    @Transient
+    private String contactEmail;
+    @Transient
+    private String contactPhone;
+
     public License withOrganizationId(String id) {
         setOrganizationId(id);
+
+        return this;
+    }
+
+    public License withOrganizationName(String name) {
+        setOrganizationName(name);
+
+        return this;
+    }
+
+    public License withContactName(String name) {
+        setContactName(name);
+
+        return this;
+    }
+
+    public License withContactEmail(String email) {
+        setContactEmail(email);
+
+        return this;
+    }
+
+    public License withContactPhone(String phone) {
+        setContactPhone(phone);
 
         return this;
     }
@@ -75,6 +109,38 @@ public class License {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getOrganizationName() {
+        return organizationName;
+    }
+
+    public void setOrganizationName(String organizationName) {
+        this.organizationName = organizationName;
+    }
+
+    public String getContactName() {
+        return contactName;
+    }
+
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
+    }
+
+    public String getContactEmail() {
+        return contactEmail;
+    }
+
+    public void setContactEmail(String contactEmail) {
+        this.contactEmail = contactEmail;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
     }
 
     @Override
