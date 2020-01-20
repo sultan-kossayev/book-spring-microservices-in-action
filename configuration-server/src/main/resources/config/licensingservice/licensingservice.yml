@@ -1,7 +1,5 @@
-tracer.property: "I AM THE DEFAULT"
 spring.data.mongodb.host: localhost
 spring.data.mongodb.port: 27017
-spring.data.mongodb.database: licenses
+spring.data.mongodb.database: springmicroservices
 
 example.property: "This is an example property"
-example.property2: "This is an example property2"
