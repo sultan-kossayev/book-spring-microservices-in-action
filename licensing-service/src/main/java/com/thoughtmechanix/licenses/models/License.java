@@ -23,8 +23,14 @@ public class License {
     @Transient
     private String contactPhone;
 
-    public License withOrganizationId(String id) {
-        setOrganizationId(id);
+    public License withId(String id) {
+        setLicenseId(id);
+
+        return this;
+    }
+
+    public License withOrganizationId(String orgId) {
+        setOrganizationId(orgId);
 
         return this;
     }

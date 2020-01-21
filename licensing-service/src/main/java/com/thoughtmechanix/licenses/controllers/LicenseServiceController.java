@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -19,6 +20,11 @@ public class LicenseServiceController {
     @RequestMapping(method = RequestMethod.POST)
     public void createLicense(@RequestBody License license) {
         licenseService.saveLicense(license);
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public List<License> getLicenses(@PathVariable("organizationId") String orgId) {
+        return licenseService.getLicensesByOrg(orgId);
     }
 
     @RequestMapping(value = "/{licenseId}", method = RequestMethod.GET)
