@@ -6,9 +6,12 @@ import com.thoughtmechanix.licenses.clients.OrganizationClient;
 import com.thoughtmechanix.licenses.clients.OrganizationDiscoveryClient;
 import com.thoughtmechanix.licenses.clients.OrganizationFeignClient;
 import com.thoughtmechanix.licenses.config.ServiceConfig;
+import com.thoughtmechanix.licenses.filters.UserContextHolder;
 import com.thoughtmechanix.licenses.models.License;
 import com.thoughtmechanix.licenses.models.Organization;
 import com.thoughtmechanix.licenses.repos.LicenseRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +21,8 @@ import java.util.Random;
 
 @Service
 public class DefaultLicenseService implements LicenseService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultLicenseService.class);
 
     @Autowired
     private LicenseRepo licenseRepo;
@@ -77,9 +82,23 @@ public class DefaultLicenseService implements LicenseService {
 
     @Override
     //@HystrixCommand(commandProperties = {@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "12000")})
-    @HystrixCommand(fallbackMethod = "buildFallbackLicenseList")
+    @HystrixCommand(fallbackMethod = "buildFallbackLicenseList",
+            threadPoolKey = "licenseByOrgThreadPool",
+            threadPoolProperties = {
+                    @HystrixProperty(name = "coreSize", value = "30"),
+                    @HystrixProperty(name = "maxQueueSize", value = "10")},
+            commandProperties = {
+                    @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "10"),
+                    @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "75"),
+                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "7000"),
+                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = "15000"),
+                    @HystrixProperty(name = "metrics.rollingStats.numBuckets", value = "5")
+            })
     public List<License> getLicensesByOrg(String organizationId) {
-        randomlyRunLong();
+        logger.info("LicenseService.getLicensesByOrg  Correlation id: {}",
+                UserContextHolder.getContext().getCorrelationId());
+
+        //randomlyRunLong();
         return licenseRepo.findByOrganizationId(organizationId);
     }
 
