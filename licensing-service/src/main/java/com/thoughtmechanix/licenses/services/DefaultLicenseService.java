@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class DefaultLicenseService implements LicenseService {
@@ -81,13 +82,13 @@ public class DefaultLicenseService implements LicenseService {
     }
 
     @Override
-    //@HystrixCommand(commandProperties = {@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "12000")})
     @HystrixCommand(fallbackMethod = "buildFallbackLicenseList",
             threadPoolKey = "licenseByOrgThreadPool",
             threadPoolProperties = {
                     @HystrixProperty(name = "coreSize", value = "30"),
                     @HystrixProperty(name = "maxQueueSize", value = "10")},
             commandProperties = {
+                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "12000"),
                     @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "10"),
                     @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "75"),
                     @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "7000"),
@@ -98,8 +99,15 @@ public class DefaultLicenseService implements LicenseService {
         logger.info("LicenseService.getLicensesByOrg  Correlation id: {}",
                 UserContextHolder.getContext().getCorrelationId());
 
-        //randomlyRunLong();
-        return licenseRepo.findByOrganizationId(organizationId);
+        Organization org = retrieveOrgInfo(organizationId, "feign");
+
+        return licenseRepo.findByOrganizationId(organizationId).stream()
+                .peek(license -> license
+                        .withOrganizationName(org.getName())
+                        .withContactName(org.getName())
+                        .withContactEmail(org.getContactEmail())
+                        .withContactPhone(org.getContactPhone())
+                ).collect(Collectors.toList());
     }
 
     private List<License> buildFallbackLicenseList(String organizationId){
@@ -111,19 +119,5 @@ public class DefaultLicenseService implements LicenseService {
 
         fallbackList.add(license);
         return fallbackList;
-    }
-
-    private void randomlyRunLong() {
-        Random rand = new Random();
-
-        int randomNum = rand.nextInt(3) + 1;
-
-        if (randomNum == 3) {
-            try {
-                Thread.sleep(11000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }
